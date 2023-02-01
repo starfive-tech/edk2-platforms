@@ -32,6 +32,14 @@
 #define DWEMMC_DMA_BUF_SIZE             (512 * 8)
 #define DWEMMC_MAX_DESC_PAGES           512
 
+/* Internal IDMAC interrupt defines */
+#define DWMCI_IDINTEN_RI		(1 << 1)
+#define DWMCI_IDINTEN_TI		(1 << 0)
+
+#define DWMCI_IDINTEN_MASK	(DWMCI_IDINTEN_TI | \
+				 DWMCI_IDINTEN_RI)
+#define DWMCI_DMA_EN		(1 << 5)
+
 typedef struct {
   UINT32                        Des0;
   UINT32                        Des1;
@@ -44,7 +52,7 @@ DWEMMC_IDMAC_DESCRIPTOR   *gpIdmacDesc;
 EFI_GUID mDwEmmcDevicePathGuid = EFI_CALLER_ID_GUID;
 STATIC UINT32 mDwEmmcCommand;
 STATIC UINT32 mDwEmmcArgument;
-
+STATIC UINT32 app_cmd = 0;
 EFI_STATUS
 DwEmmcReadBlockData (
   IN EFI_MMC_HOST_PROTOCOL     *This,
@@ -92,6 +100,24 @@ DwEmmcIsDmaSupported (
   )
 {
   return TRUE;
+}
+
+void mmc_debug_printf()
+{
+       //UINT32 data, data1,
+       UINT32 addr = 0x16020000;
+
+       //data = MmioRead32(0x13020170);
+       //data1 = MmioRead32(0x13020178);
+
+       //DEBUG ((DEBUG_INFO, "\nCLK 0 0x%x clk 1 0x%x\n", data, data1));
+       for (; addr <= 0x16020098; addr+=4) {
+               if ((addr & 0xf) == 0x0) {
+                       DEBUG ((DEBUG_INFO,"\naddr 0x%08x:", addr));
+               }
+               DEBUG ((DEBUG_INFO, "  %08x", MmioRead32(addr)));
+       }
+       DEBUG ((DEBUG_INFO, "\n"));
 }
 
 EFI_STATUS
@@ -204,6 +230,7 @@ DwEmmcNotifyState (
     ASSERT (!EFI_ERROR (Status));
     // Wait clock stable
     MicroSecondDelay (100);
+    MmioWrite32 (DWEMMC_CTYPE, 0);
 
     MmioWrite32 (DWEMMC_RINTSTS, ~0);
     MmioWrite32 (DWEMMC_INTMASK, 0);
@@ -215,6 +242,7 @@ DwEmmcNotifyState (
     do {
       Data = MmioRead32 (DWEMMC_BMOD);
     } while (Data & DWEMMC_IDMAC_SWRESET);
+    MmioWrite32 (DWEMMC_IDINTEN, 0x3);
     break;
   case MmcIdleState:
     break;
@@ -286,6 +314,8 @@ SendCommand (
   MmioWrite32 (DWEMMC_CMDARG, Argument);
   MmioWrite32 (DWEMMC_CMD, MmcCmd);
 
+  //DEBUG ((DEBUG_INFO, "send cmd %d\n", MmcCmd & 0x3f));
+
   ErrMask = DWEMMC_INT_EBE | DWEMMC_INT_HLE | DWEMMC_INT_RTO |
             DWEMMC_INT_RCRC | DWEMMC_INT_RE;
   ErrMask |= DWEMMC_INT_DCRC | DWEMMC_INT_DRT | DWEMMC_INT_SBE;
@@ -313,6 +343,7 @@ DwEmmcSendCommand (
   UINT32       Cmd = 0;
   EFI_STATUS   Status = EFI_SUCCESS;
 
+
   switch (MMC_GET_INDX(MmcCmd)) {
   case MMC_INDX(0):
     Cmd = BIT_CMD_SEND_INIT;
@@ -334,10 +365,14 @@ DwEmmcSendCommand (
     else
         Cmd = 0;
     break;
-  case MMC_INDX(8):
-    Cmd = BIT_CMD_RESPONSE_EXPECT | BIT_CMD_CHECK_RESPONSE_CRC |
-           BIT_CMD_DATA_EXPECTED | BIT_CMD_READ |
+  case MMC_INDX(8): 
+    if (Argument) /* sd */
+    	Cmd = BIT_CMD_RESPONSE_EXPECT | BIT_CMD_CHECK_RESPONSE_CRC |
            BIT_CMD_WAIT_PRVDATA_COMPLETE;
+    else /* emmc */
+	    Cmd = BIT_CMD_RESPONSE_EXPECT | BIT_CMD_CHECK_RESPONSE_CRC |
+	       BIT_CMD_DATA_EXPECTED | BIT_CMD_READ | 
+	       BIT_CMD_WAIT_PRVDATA_COMPLETE; 
     break;
   case MMC_INDX(9):
     Cmd = BIT_CMD_RESPONSE_EXPECT | BIT_CMD_CHECK_RESPONSE_CRC |
@@ -353,8 +388,16 @@ DwEmmcSendCommand (
     break;
   case MMC_INDX(16):
     Cmd = BIT_CMD_RESPONSE_EXPECT | BIT_CMD_CHECK_RESPONSE_CRC |
+    	  /* BIT_CMD_DATA_EXPECTED | BIT_CMD_READ | */
+	  BIT_CMD_WAIT_PRVDATA_COMPLETE;
+    break;
+  case MMC_INDX(6): /* sd */
+    if (MmcCmd & (1 << 31))
+    	Cmd = BIT_CMD_RESPONSE_EXPECT | BIT_CMD_CHECK_RESPONSE_CRC |
            BIT_CMD_DATA_EXPECTED | BIT_CMD_READ |
            BIT_CMD_WAIT_PRVDATA_COMPLETE;
+    else
+    	Cmd = BIT_CMD_RESPONSE_EXPECT | BIT_CMD_CHECK_RESPONSE_CRC;
     break;
   case MMC_INDX(17):
   case MMC_INDX(18):
@@ -377,6 +420,24 @@ DwEmmcSendCommand (
     break;
   }
 
+  if (app_cmd) {
+    switch (MMC_GET_INDX(MmcCmd)) {
+    case MMC_INDX(41):
+    	Cmd = BIT_CMD_RESPONSE_EXPECT;
+	break;
+    case MMC_INDX(51):
+    	Cmd = BIT_CMD_RESPONSE_EXPECT | BIT_CMD_CHECK_RESPONSE_CRC |
+           BIT_CMD_DATA_EXPECTED | BIT_CMD_READ |
+           BIT_CMD_WAIT_PRVDATA_COMPLETE;
+    	break;
+    case MMC_INDX(6):
+	 Cmd = BIT_CMD_RESPONSE_EXPECT | BIT_CMD_CHECK_RESPONSE_CRC;
+	break;
+    default:
+    	break;
+    }
+  }
+
   Cmd |= MMC_GET_INDX(MmcCmd) | BIT_CMD_USE_HOLD_REG | BIT_CMD_START;
   if (IsPendingReadCommand (Cmd) || IsPendingWriteCommand (Cmd)) {
     mDwEmmcCommand = Cmd;
@@ -384,6 +445,11 @@ DwEmmcSendCommand (
   } else {
     Status = SendCommand (Cmd, Argument);
   }
+  if ((Status == EFI_SUCCESS) && ((MmcCmd & 0x3f) == 55))
+  	app_cmd = 1;
+  else
+  	app_cmd = 0;
+
   return Status;
 }
 
@@ -463,10 +529,18 @@ PrepareDmaData (
   )
 {
   UINTN  Cnt, Blks, Idx, LastIdx;
+  UINT32 Data/* , flag, cnt */;
+
+  MmioWrite32 (DWEMMC_CTRL, DWEMMC_CTRL_FIFO_RESET);
+  do {
+    // Wait until reset operation finished
+    Data = MmioRead32 (DWEMMC_CTRL);
+  } while (Data & DWEMMC_CTRL_RESET_ALL);
+  MmioWrite32 (DWEMMC_IDSTS, 0xffffffff);
 
   Cnt = (Length + DWEMMC_DMA_BUF_SIZE - 1) / DWEMMC_DMA_BUF_SIZE;
   Blks = (Length + DWEMMC_BLOCK_SIZE - 1) / DWEMMC_BLOCK_SIZE;
-  Length = DWEMMC_BLOCK_SIZE * Blks;
+  //Length = DWEMMC_BLOCK_SIZE * Blks;
 
   for (Idx = 0; Idx < Cnt; Idx++) {
     (IdmacDesc + Idx)->Des0 = DWEMMC_IDMAC_DES0_OWN | DWEMMC_IDMAC_DES0_CH |
@@ -487,9 +561,8 @@ PrepareDmaData (
   (IdmacDesc + LastIdx)->Des1 = DWEMMC_IDMAC_DES1_BS1(Length -
                                                       (LastIdx * DWEMMC_DMA_BUF_SIZE));
   /* Set the Next field of Last Descriptor */
-  (IdmacDesc + LastIdx)->Des3 = 0;
+  //(IdmacDesc + LastIdx)->Des3 = 0;
   MmioWrite32 (DWEMMC_DBADDR, (UINT32)((UINTN)IdmacDesc));
-
   return EFI_SUCCESS;
 }
 
@@ -501,15 +574,53 @@ StartDma (
   UINT32 Data;
 
   Data = MmioRead32 (DWEMMC_CTRL);
-  Data |= DWEMMC_CTRL_INT_EN | DWEMMC_CTRL_DMA_EN | DWEMMC_CTRL_IDMAC_EN;
+  Data |=  DWEMMC_CTRL_DMA_EN | DWEMMC_CTRL_IDMAC_EN;
   MmioWrite32 (DWEMMC_CTRL, Data);
   Data = MmioRead32 (DWEMMC_BMOD);
   Data |= DWEMMC_IDMAC_ENABLE | DWEMMC_IDMAC_FB;
   MmioWrite32 (DWEMMC_BMOD, Data);
 
-  MmioWrite32 (DWEMMC_BLKSIZ, DWEMMC_BLOCK_SIZE);
+  MmioWrite32 (DWEMMC_BLKSIZ, 
+  	(Length < DWEMMC_BLOCK_SIZE) ? Length : DWEMMC_BLOCK_SIZE);
   MmioWrite32 (DWEMMC_BYTCNT, Length);
 }
+
+
+EFI_STATUS
+DwEmmcWaitDmaComplete (
+  IN EFI_MMC_HOST_PROTOCOL     *This,
+  IN UINT32 read
+  )
+{
+  UINT32 mask, Ctrl, timeout = 100000;
+  EFI_STATUS ret = EFI_SUCCESS;
+
+  if (read)
+  	mask = DWMCI_IDINTEN_RI;
+  else
+  	mask = DWMCI_IDINTEN_TI;
+
+  do {
+    Ctrl = MmioRead32 (DWEMMC_IDSTS);
+    if (Ctrl & mask)
+	break;
+    timeout--;
+    gBS->Stall(1);
+  } while (timeout);
+
+  if (!timeout) {
+    DEBUG ((DEBUG_INFO, "wait dma to\n"));
+    ret = EFI_DEVICE_ERROR;
+  }
+  MmioWrite32 (DWEMMC_IDSTS, DWMCI_IDINTEN_MASK);
+  Ctrl = MmioRead32(DWEMMC_CTRL);
+  Ctrl &= ~(DWMCI_DMA_EN);
+  Ctrl = MmioWrite32(DWEMMC_CTRL, Ctrl);
+
+  gBS->Stall(100);
+  return ret;
+}
+
 
 EFI_STATUS
 DwEmmcReadBlockData (
@@ -530,6 +641,7 @@ DwEmmcReadBlockData (
   DescPages = (Count + CountPerPage - 1) / CountPerPage;
 
   InvalidateDataCacheRange (Buffer, Length);
+ // DEBUG ((DEBUG_INFO, "BUFFER %lx length %x\n", (UINT64)Buffer, Length));
 
   Status = PrepareDmaData (gpIdmacDesc, Length, Buffer);
   if (EFI_ERROR (Status)) {
@@ -544,6 +656,7 @@ DwEmmcReadBlockData (
     DEBUG ((DEBUG_ERROR, "Failed to read data, mDwEmmcCommand:%x, mDwEmmcArgument:%x, Status:%r\n", mDwEmmcCommand, mDwEmmcArgument, Status));
     goto out;
   }
+  Status = DwEmmcWaitDmaComplete(This, 1);
 out:
   // Restore Tpl
   gBS->RestoreTPL (Tpl);
@@ -583,6 +696,7 @@ DwEmmcWriteBlockData (
     DEBUG ((DEBUG_ERROR, "Failed to write data, mDwEmmcCommand:%x, mDwEmmcArgument:%x, Status:%r\n", mDwEmmcCommand, mDwEmmcArgument, Status));
     goto out;
   }
+  Status = DwEmmcWaitDmaComplete(This, 0);
 out:
   // Restore Tpl
   gBS->RestoreTPL (Tpl);
@@ -620,6 +734,8 @@ DwEmmcSetIos (
     }
     MmioWrite32 (DWEMMC_UHSREG, Data);
   }
+
+  DEBUG ((DEBUG_INFO, "Set bus width %d clock %d\n",BusWidth, BusClockFreq));
 
   switch (BusWidth) {
   case 1:
