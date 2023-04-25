@@ -132,12 +132,3 @@ ASM_FUNC (RiscVSetSupervisorStvec)
 ASM_FUNC (RiscVGetSupervisorStvec)
     csrr a0, RISCV_CSR_SUPERVISOR_STVEC
     ret
-
-//
-// Set Supervisor Address Translation and
-// Protection Register.
-//
-ASM_FUNC (RiscVSetSupervisorAddressTranslationRegister)
-    csrw  RISCV_CSR_SUPERVISOR_SATP, a0
-    ret
-
