@@ -25,6 +25,11 @@
 
 #include <Protocol/MmcHost.h>
 
+#ifdef CONFIG_DWEMMC
+#define PcdDwDxeBaseAddress ((UINT32)PcdGet32 (PcdDwEmmcDxeBaseAddress))
+#elif CONFIG_DWSDMMC
+#define PcdDwDxeBaseAddress ((UINT32)PcdGet32 (PcdDwSdDxeBaseAddress))
+#endif
 #include "DwEmmc.h"
 
 #define DWEMMC_DESC_PAGE                1
