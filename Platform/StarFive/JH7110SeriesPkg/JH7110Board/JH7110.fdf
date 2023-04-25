@@ -209,6 +209,7 @@ INF  ShellPkg/Application/Shell/Shell.inf
 #
 INF  EmbeddedPkg/Universal/MmcDxe/MmcDxe.inf
 INF  Silicon/Synopsys/DesignWare/Drivers/DwEmmcDxe/DwEmmcDxe.inf
+INF  Silicon/Synopsys/DesignWare/Drivers/DwEmmcDxe/DwSdmmcDxe.inf
 
 #
 # Usb Support

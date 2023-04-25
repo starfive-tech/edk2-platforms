@@ -362,6 +362,7 @@
   # DW MMC/SD card controller
   #
   gDesignWareTokenSpaceGuid.PcdDwEmmcDxeBaseAddress|0x16010000
+  gDesignWareTokenSpaceGuid.PcdDwSdDxeBaseAddress|0x16020000
   gDesignWareTokenSpaceGuid.PcdDwEmmcDxeClockFrequencyInHz|198000000
   gDesignWareTokenSpaceGuid.PcdDwEmmcDxeMaxClockFreqInHz|198000000
   gDesignWareTokenSpaceGuid.PcdDwPermitObsoleteDrivers|TRUE
@@ -529,7 +530,14 @@
   # sdio/mmc support
   #
   EmbeddedPkg/Universal/MmcDxe/MmcDxe.inf
-  Silicon/Synopsys/DesignWare/Drivers/DwEmmcDxe/DwEmmcDxe.inf
+  Silicon/Synopsys/DesignWare/Drivers/DwEmmcDxe/DwEmmcDxe.inf {
+    <BuildOptions>
+      GCC:*_*_*_CC_FLAGS       = -DCONFIG_DWEMMC
+  }
+  Silicon/Synopsys/DesignWare/Drivers/DwEmmcDxe/DwSdmmcDxe.inf {
+    <BuildOptions>
+      GCC:*_*_*_CC_FLAGS       = -DCONFIG_DWSDMMC
+  }
 
   #
   # Usb Support
@@ -584,4 +592,4 @@
 !endif
 
   MdeModulePkg/Application/UiApp/UiApp.inf
-  
+
