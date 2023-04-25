@@ -361,7 +361,7 @@
  #
   # DW MMC/SD card controller
   #
-  gDesignWareTokenSpaceGuid.PcdDwEmmcDxeBaseAddress|0x16020000
+  gDesignWareTokenSpaceGuid.PcdDwEmmcDxeBaseAddress|0x16010000
   gDesignWareTokenSpaceGuid.PcdDwEmmcDxeClockFrequencyInHz|198000000
   gDesignWareTokenSpaceGuid.PcdDwEmmcDxeMaxClockFreqInHz|198000000
   gDesignWareTokenSpaceGuid.PcdDwPermitObsoleteDrivers|TRUE
