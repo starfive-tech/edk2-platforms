@@ -597,7 +597,7 @@ DwEmmcWaitDmaComplete (
   IN UINT32 read
   )
 {
-  UINT32 mask, Ctrl, timeout = 100000;
+  UINT32 mask, Ctrl, timeout = 1000000;
   EFI_STATUS ret = EFI_SUCCESS;
 
   if (read)
