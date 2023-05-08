@@ -20,9 +20,18 @@
   starfive-jh7110-isp.h
   starfive-jh7110-vout.h
   starfive-jh7110.h
-  starfive_visionfive2.dts
+  thermal.h
+  starfive-jh7110-pinfunc.h
+  jh7110-power.h
+  common.h
+  gpio.h
+  irq.h
   jh7110.dtsi
-  jh7110_clk.dtsi
+  starfive_visionfive2.dtsi
+  starfive_visionfive2.dts
+  sf_hdmi.dtsi
+  sf_pwmdac.dtsi
+  jh7110-clk.dtsi
 
 [Packages]
   MdePkg/MdePkg.dec
