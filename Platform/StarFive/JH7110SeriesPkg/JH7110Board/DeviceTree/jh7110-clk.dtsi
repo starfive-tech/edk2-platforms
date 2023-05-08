@@ -4,8 +4,13 @@
  */
 
 / {
-	/* clock tree external clocks */
 	osc: osc {
+		compatible = "fixed-clock";
+		#clock-cells = <0>;
+		clock-frequency = <24000000>;
+	};
+
+	clk_ext_camera: clk-ext-camera {
 		compatible = "fixed-clock";
 		#clock-cells = <0>;
 		clock-frequency = <24000000>;
@@ -56,7 +61,7 @@
 	mclk_ext: mclk_ext {
 		compatible = "fixed-clock";
 		#clock-cells = <0>;
-		clock-frequency = <49152000>;
+		clock-frequency = <12288000>;
 	};
 
 	jtag_tck_inner: jtag_tck_inner {
@@ -69,12 +74,6 @@
 		compatible = "fixed-clock";
 		#clock-cells = <0>;
 		clock-frequency = <50000000>;
-	};
-
-	stg_apb: stg_apb {
-		compatible = "fixed-clock";
-		#clock-cells = <0>;
-		clock-frequency = <51200000>;
 	};
 
 	gmac0_rmii_refin: gmac0_rmii_refin {
@@ -112,5 +111,16 @@
 		#clock-cells = <0>;
 		clock-frequency = <297000000>;
 	};
-	/* external clocks end */
+
+	wm8960_mclk: wm8960_mclk {
+		compatible = "fixed-clock";
+		#clock-cells = <0>;
+		clock-frequency = <24576000>;
+	};
+
+	ac108_mclk: ac108_mclk {
+		compatible = "fixed-clock";
+		#clock-cells = <0>;
+		clock-frequency = <24000000>;
+	};
 };
