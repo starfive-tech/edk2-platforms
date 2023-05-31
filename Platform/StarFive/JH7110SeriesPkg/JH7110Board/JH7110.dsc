@@ -153,7 +153,9 @@
   #MachineModeTimerLib|Silicon/RISC-V/ProcessorPkg/Library/RiscVReadMachineModeTimer/MachineModeTimerLib/MachineModeTimerLib.inf
   MachineModeTimerLib|Silicon/RISC-V/ProcessorPkg/Library/RiscVReadMachineModeTimer/EmulatedMachineModeTimerLib/EmulatedMachineModeTimerLib.inf
   CpuExceptionHandlerLib|Silicon/RISC-V/ProcessorPkg/Library/RiscVExceptionLib/CpuExceptionHandlerDxeLib.inf
-
+  #Pci dependencies 
+  PciHostBridgeLib|Silicon/StarFive/JH7110/Library/PciHostBridgeLib/PciHostBridgeLib.inf
+  PciSegmentLib|Silicon/StarFive/JH7110/Library/PciSegmentLib/PciSegmentLib.inf
 
   # Flattened Device Tree (FDT) access library
   FdtLib|EmbeddedPkg/Library/FdtLib/FdtLib.inf
@@ -454,10 +456,6 @@
 !endif
 
   UefiCpuPkg/CpuIo2Dxe/CpuIo2Dxe.inf
-  MdeModulePkg/Bus/Pci/PciBusDxe/PciBusDxe.inf {
-    <LibraryClasses>
-      PcdLib|MdePkg/Library/DxePcdLib/DxePcdLib.inf
-  }
   MdeModulePkg/Universal/Metronome/Metronome.inf
   MdeModulePkg/Universal/BdsDxe/BdsDxe.inf
   MdeModulePkg/Universal/ResetSystemRuntimeDxe/ResetSystemRuntimeDxe.inf {
@@ -538,6 +536,21 @@
     <BuildOptions>
       GCC:*_*_*_CC_FLAGS       = -DCONFIG_DWSDMMC
   }
+
+   #
+   # PCIe support
+   #
+   MdeModulePkg/Bus/Pci/PciBusDxe/PciBusDxe.inf {
+    <LibraryClasses>
+      PcdLib|MdePkg/Library/DxePcdLib/DxePcdLib.inf
+  }
+  MdeModulePkg/Bus/Pci/PciHostBridgeDxe/PciHostBridgeDxe.inf
+  #Silicon/StarFive/JH7110/Library/PciHostBridgeLib/PciHostBridgeLib.inf
+  #Silicon/StarFive/JH7110/Library/PciSegmentLib/PciSegmentLib.inf
+  #
+  # NVMe boot devices
+  #
+  MdeModulePkg/Bus/Pci/NvmExpressDxe/NvmExpressDxe.inf
 
   #
   # Usb Support

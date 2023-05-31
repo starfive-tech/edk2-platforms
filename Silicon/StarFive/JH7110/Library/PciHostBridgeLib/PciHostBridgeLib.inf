@@ -1,0 +1,48 @@
+## @file
+#
+#  PCI Host Bridge Library instance for StarFive JH7110 SOC
+#  Liberally borrowed from the SynQuacer
+#
+#  Copyright (c) 2023 Minda Chen <minda.chen@starfivetech.com>
+#
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+##
+
+[Defines]
+  INF_VERSION                    = 0x00010019
+  BASE_NAME                      = PciHostBridgeLib
+  FILE_GUID                      = 8d52c038-0040-11ea-83fb-5254005675a0
+  MODULE_TYPE                    = DXE_DRIVER
+  VERSION_STRING                 = 1.0
+  LIBRARY_CLASS                  = PciHostBridgeLib|DXE_DRIVER
+  CONSTRUCTOR                    = JH7110PciHostBridgeLibConstructor
+
+#
+# The following information is for reference only and not required by the build
+# tools.
+#
+#  VALID_ARCHITECTURES           = ARM AARCH64 RISCV64
+#
+
+[Sources]
+  PciHostBridgeLib.c
+  PciHostBridgeLibConstructor.c
+
+[Packages]
+  MdePkg/MdePkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+  Silicon/StarFive/JH7110/JH7110.dec
+
+[LibraryClasses]
+  DebugLib
+  DevicePathLib
+  MemoryAllocationLib
+  PcdLib
+  UefiBootServicesTableLib
+
+[FixedPcd]
+  gJH7110TokenSpaceGuid.PcdJH7110PciRegBase
+  gJH7110TokenSpaceGuid.PcdJH7110PciBusMmioAdr
+  gJH7110TokenSpaceGuid.PcdJH7110PciBusMmioLen
+  gJH7110TokenSpaceGuid.PcdJH7110PciCpuMmioAdr

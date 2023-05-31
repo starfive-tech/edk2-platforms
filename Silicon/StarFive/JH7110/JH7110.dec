@@ -1,0 +1,28 @@
+## @file
+#
+#  Copyright (c) 2023, Minda Chen <minda.chen@starfivetech.com>
+#
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+##
+
+[Defines]
+  DEC_SPECIFICATION              = 0x0001001A
+  PACKAGE_NAME                   = JH7110Pkg
+  PACKAGE_GUID                   = D4B585C5-EBCA-4779-B974-05A3CF2F10C4
+  PACKAGE_VERSION                = 1.0
+
+[Includes]
+  Include
+
+[Guids]
+  gJH7110TokenSpaceGuid = {0x44045e56, 0x7056, 0x4be6, {0x88, 0xc0, 0x49, 0x0c, 0x67, 0x90, 0x2f, 0xba}}
+
+[PcdsFixedAtBuild.common]
+  gJH7110TokenSpaceGuid.PcdJH7110RegistersAddress|0|UINT32|0x00000001
+  gJH7110TokenSpaceGuid.PcdJH7110PciRegBase|0x2b000000|UINT64|0x00000002
+  gJH7110TokenSpaceGuid.PcdJH7110PciBusMmioAdr|0x0|UINT64|0x00000003
+  gJH7110TokenSpaceGuid.PcdJH7110PciBusMmioLen|0x0|UINT32|0x00000004
+  gJH7110TokenSpaceGuid.PcdJH7110PciCpuMmioAdr|0x0|UINT64|0x00000005
+
+  gJH7110TokenSpaceGuid.PcdJH7110PciConfigRegBase|0x9c0000000|UINT64|0x00000006

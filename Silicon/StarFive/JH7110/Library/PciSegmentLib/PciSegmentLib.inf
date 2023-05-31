@@ -1,0 +1,34 @@
+## @file
+# PCI Segment Library for StarFive JH7110 SoC
+#
+# Copyright (c) 2023, Minda Chen <minda.chen@starfivetech.com>
+# Copyright (c) 2007 - 2014, Intel Corporation. All rights reserved.<BR>
+#
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+##
+
+[Defines]
+  INF_VERSION                    = 0x0001001B
+  BASE_NAME                      = PciSegmentLib
+  FILE_GUID                      = 74fe3f9e-0040-11ea-a7bf-5254005675a0
+  MODULE_TYPE                    = BASE
+  VERSION_STRING                 = 1.0
+  LIBRARY_CLASS                  = PciSegmentLib
+
+[Sources]
+  PciSegmentLib.c
+
+[Packages]
+  MdePkg/MdePkg.dec
+  Silicon/StarFive/JH7110/JH7110.dec
+
+[LibraryClasses]
+  BaseLib
+  DebugLib
+  IoLib
+  PcdLib
+  UefiLib
+
+[FixedPcd]
+  gJH7110TokenSpaceGuid.PcdJH7110PciConfigRegBase
