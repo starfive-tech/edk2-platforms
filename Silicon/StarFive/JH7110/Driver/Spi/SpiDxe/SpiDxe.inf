@@ -1,0 +1,55 @@
+#
+# SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = SpiDxe
+  FILE_GUID                      = 2FBD9E55-9BC7-4EEF-BF93-0D5582FE647B
+  MODULE_TYPE                    = DXE_RUNTIME_DRIVER
+  VERSION_STRING                 = 1.0
+  ENTRY_POINT                    = SpiEntryPoint
+
+[Sources]
+  SpiDxe.c
+  SpiApbDxe.c
+  SpiDxe.h
+  SpiApbDxe.h
+
+[Packages]
+  EmbeddedPkg/EmbeddedPkg.dec
+  MdePkg/MdePkg.dec
+  Silicon/StarFive/JH7110/JH7110.dec
+
+[LibraryClasses]
+  DebugLib
+  DxeServicesTableLib
+  IoLib
+  MemoryAllocationLib
+  NorFlashInfoLib
+  TimerLib
+  UefiBootServicesTableLib
+  UefiDriverEntryPoint
+  UefiLib
+  UefiRuntimeLib
+
+[FixedPcd]
+	gJH7110TokenSpaceGuid.PcdSpiFlashRegBase   
+	gJH7110TokenSpaceGuid.PcdSpiFlashAhbBase   
+  gJH7110TokenSpaceGuid.PcdSpiFlashAhbSize   
+	gJH7110TokenSpaceGuid.PcdSpiFlashFifoDepth 
+	gJH7110TokenSpaceGuid.PcdSpiFlashFifoWidth 
+	gJH7110TokenSpaceGuid.PcdSpiFlashTrigAdd   
+  gJH7110TokenSpaceGuid.PcdSpiFlashReadDelay     
+	gJH7110TokenSpaceGuid.PcdSpiFlashMaxHz     
+  gJH7110TokenSpaceGuid.PcdSpiFlashRefClkHz 
+	gJH7110TokenSpaceGuid.PcdSpiFlashTshslNs   
+	gJH7110TokenSpaceGuid.PcdSpiFlashTsd2dNs   
+	gJH7110TokenSpaceGuid.PcdSpiFlashTchshNs   
+	gJH7110TokenSpaceGuid.PcdSpiFlashTslchNs   
+
+[Protocols]
+  gJH7110SpiMasterProtocolGuid
+
+[Depex]
+  TRUE
