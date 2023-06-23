@@ -127,7 +127,10 @@ READ_LOCK_STATUS   = TRUE
 APRIORI DXE {
   INF  MdeModulePkg/Universal/DevicePathDxe/DevicePathDxe.inf
   INF  MdeModulePkg/Universal/PCD/Dxe/Pcd.inf
-  INF  Platform/StarFive/JH7110SeriesPkg/Universal/Dxe/RamFvbServicesRuntimeDxe/FvbServicesRuntimeDxe.inf
+  #INF  Platform/StarFive/JH7110SeriesPkg/Universal/Dxe/RamFvbServicesRuntimeDxe/FvbServicesRuntimeDxe.inf
+  INF Silicon/StarFive/JH7110/Driver/Spi/SpiDxe/SpiDxe.inf
+  INF Silicon/StarFive/JH7110/Driver/Spi/SpiFlashDxe/SpiFlashDxe.inf
+  INF Silicon/StarFive/JH7110/Driver/Spi/FvbDxe/FvbDxe.inf
 }
 
 #
@@ -146,7 +149,7 @@ INF  MdeModulePkg/Universal/Metronome/Metronome.inf
 INF  EmbeddedPkg/RealTimeClockRuntimeDxe/RealTimeClockRuntimeDxe.inf
 
 # RISC-V Platform Drivers
-INF  Platform/StarFive/JH7110SeriesPkg/Universal/Dxe/RamFvbServicesRuntimeDxe/FvbServicesRuntimeDxe.inf
+#INF  Platform/StarFive/JH7110SeriesPkg/Universal/Dxe/RamFvbServicesRuntimeDxe/FvbServicesRuntimeDxe.inf
 
 # RISC-V Core Drivers
 INF  Platform/StarFive/JH7110SeriesPkg/Universal/Dxe/TimerDxe/TimerDxe.inf
@@ -231,6 +234,12 @@ INF  MdeModulePkg/Bus/Usb/UsbMassStorageDxe/UsbMassStorageDxe.inf
 
 INF  MdeModulePkg/Application/UiApp/UiApp.inf
 
+#
+# QSPI Flash Support
+#
+INF Silicon/StarFive/JH7110/Driver/Spi/SpiDxe/SpiDxe.inf
+INF Silicon/StarFive/JH7110/Driver/Spi/SpiFlashDxe/SpiFlashDxe.inf
+INF Silicon/StarFive/JH7110/Driver/Spi/FvbDxe/FvbDxe.inf
 ################################################################################
 
 [FV.FVMAIN_COMPACT]

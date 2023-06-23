@@ -102,6 +102,7 @@
   FdtLib|EmbeddedPkg/Library/FdtLib/FdtLib.inf
   VariableFlashInfoLib|MdeModulePkg/Library/BaseVariableFlashInfoLib/BaseVariableFlashInfoLib.inf
   VariablePolicyHelperLib|MdeModulePkg/Library/VariablePolicyHelperLib/VariablePolicyHelperLib.inf
+  NorFlashInfoLib|EmbeddedPkg/Library/NorFlashInfoLib/NorFlashInfoLib.inf
 
 # RISC-V Platform Library
   TimeBaseLib|EmbeddedPkg//Library/TimeBaseLib/TimeBaseLib.inf
@@ -370,6 +371,31 @@
   gDesignWareTokenSpaceGuid.PcdDwPermitObsoleteDrivers|TRUE
   gDesignWareTokenSpaceGuid.PcdDwEmmcDxeFifoDepth|32
 
+  #SPI
+  gJH7110TokenSpaceGuid.PcdSpiFlashRegBase|0x13010000
+  gJH7110TokenSpaceGuid.PcdSpiFlashAhbBase|0x21000000
+  gJH7110TokenSpaceGuid.PcdSpiFlashAhbSize|0x400000
+  gJH7110TokenSpaceGuid.PcdSpiFlashFifoDepth|256
+  gJH7110TokenSpaceGuid.PcdSpiFlashFifoWidth|4
+  gJH7110TokenSpaceGuid.PcdSpiFlashTrigAdd|0
+  gJH7110TokenSpaceGuid.PcdSpiFlashReadDelay|0xFFFF
+  gJH7110TokenSpaceGuid.PcdSpiFlashMaxHz|100000000
+  gJH7110TokenSpaceGuid.PcdSpiFlashRefClkHz|100000000
+  gJH7110TokenSpaceGuid.PcdSpiFlashTshslNs|1
+  gJH7110TokenSpaceGuid.PcdSpiFlashTsd2dNs|1
+  gJH7110TokenSpaceGuid.PcdSpiFlashTchshNs|1
+  gJH7110TokenSpaceGuid.PcdSpiFlashTslchNs|1
+
+  #
+  # Variable store - default values
+  #
+  gJH7110TokenSpaceGuid.PcdSpiMemoryMapped|FALSE
+  gJH7110TokenSpaceGuid.PcdSpiVariableOffset|0x00800000
+  gEfiMdeModulePkgTokenSpaceGuid.PcdFlashNvStorageVariableSize|0x00010000
+  gEfiMdeModulePkgTokenSpaceGuid.PcdFlashNvStorageFtwWorkingSize|0x00010000
+  gEfiMdeModulePkgTokenSpaceGuid.PcdFlashNvStorageFtwSpareSize|0x00010000
+
+
 ################################################################################
 #
 # Pcd Dynamic Section - list of all EDK II PCD Entries defined by this Platform
@@ -378,7 +404,9 @@
 
 [PcdsDynamicDefault]
   gEfiMdeModulePkgTokenSpaceGuid.PcdEmuVariableNvStoreReserved|0
-  gEfiMdeModulePkgTokenSpaceGuid.PcdFlashNvStorageVariableBase64|0
+  gEfiMdeModulePkgTokenSpaceGuid.PcdFlashNvStorageVariableBase64|0x40800000
+  gEfiMdeModulePkgTokenSpaceGuid.PcdFlashNvStorageFtwWorkingBase64|0x40810000
+  gEfiMdeModulePkgTokenSpaceGuid.PcdFlashNvStorageFtwSpareBase64|0x40820000
   gEfiMdeModulePkgTokenSpaceGuid.PcdFlashNvStorageFtwWorkingBase|0
   gEfiMdeModulePkgTokenSpaceGuid.PcdFlashNvStorageFtwSpareBase|0
   gEfiMdeModulePkgTokenSpaceGuid.PcdPciDisableBusEnumeration|FALSE
@@ -468,7 +496,7 @@
   # RISC-V Platform module
   #
   Platform/StarFive/JH7110SeriesPkg/Universal/Dxe/TimerDxe/TimerDxe.inf
-  Platform/StarFive/JH7110SeriesPkg/Universal/Dxe/RamFvbServicesRuntimeDxe/FvbServicesRuntimeDxe.inf
+  #Platform/StarFive/JH7110SeriesPkg/Universal/Dxe/RamFvbServicesRuntimeDxe/FvbServicesRuntimeDxe.inf
 
   #
   # RISC-V Core module
@@ -569,6 +597,13 @@
   #
   FatPkg/EnhancedFatDxe/Fat.inf
   MdeModulePkg/Universal/Disk/UdfDxe/UdfDxe.inf
+
+  #
+  # QSPI Flash Support
+  #
+  Silicon/StarFive/JH7110/Driver/Spi/SpiDxe/SpiDxe.inf
+  Silicon/StarFive/JH7110/Driver/Spi/SpiFlashDxe/SpiFlashDxe.inf
+  Silicon/StarFive/JH7110/Driver/Spi/FvbDxe/FvbDxe.inf
 
   OvmfPkg/LinuxInitrdDynamicShellCommand/LinuxInitrdDynamicShellCommand.inf {
     <PcdsFixedAtBuild>
